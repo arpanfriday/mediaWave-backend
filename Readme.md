@@ -1,4 +1,4 @@
-# YouTube Backend
+# MediaWave Backend
 
 This is a backend project for a video streaming platform built with Node.js. The project provides APIs for user authentication, video upload, streaming, and more.
 
