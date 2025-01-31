@@ -20,8 +20,8 @@ This is a backend project for a video streaming platform built with Node.js. The
 ### Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/youtube_backend.git
-cd youtube_backend
+git clone https://github.com/yourusername/mediaWave-backend.git
+cd mediaWave-backend
 ```
 
 ### Install dependencies
@@ -35,9 +35,13 @@ npm install
 Create a `.env` file in the root directory and add the following environment variables:
 
 ```
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
 PORT=your_port_number
+MONGODB_URI=your_mongodb_connection_string
+CORS_ORIGIN=[allowed_urls]
+ACCESS_TOKEN_SECRET=your_jwt_access_token_secret
+ACCESS_TOKEN_EXPIRY=1d
+REFRESH_TOKEN_SECRET=your_jwt_refresh_token_secret
+REFRESH_TOKEN_EXPIRY=7d
 ```
 
 ### Running the Project
