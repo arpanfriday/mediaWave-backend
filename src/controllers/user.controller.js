@@ -8,10 +8,14 @@ const registerUser = asyncHandler(async (req, res) => {
     const { fullName, email, username, password } = req.body;
 
     // TODO: Replace with JOI schema validatio
-    if (fullName === "") throw new ApiError(400, "fullName is required");
-    if (email === "") throw new ApiError(400, "email is required");
-    if (username === "") throw new ApiError(400, "username is required");
-    if (password === "") throw new ApiError(400, "password is required");
+    if (fullName === "" || fullName === undefined)
+        throw new ApiError(400, "fullName is required");
+    if (email === "" || email === undefined)
+        throw new ApiError(400, "email is required");
+    if (username === "" || username === undefined)
+        throw new ApiError(400, "username is required");
+    if (password === "" || password === undefined)
+        throw new ApiError(400, "password is required");
 
     // Check if registering user already exists
     const existedUser = await User.findOne({
@@ -22,7 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     // Check for multer avatar and coverimage
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path;
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
     if (!avatarLocalPath) throw new ApiError(400, "Avatar file is required");
 
