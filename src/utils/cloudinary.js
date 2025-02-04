@@ -21,11 +21,12 @@ const uploadToCloudinary = async (localFilePath) => {
             console.log(
                 "File uplodaded on: ",
                 result.url,
-                " and unlinked from filesystem"
+                "and unlinked from filesystem"
             );
             return result;
         })
         .catch((error) => {
+            // TODO: Implement a retry strategy here. If the upload fails by any change, the upload will be retried
             fs.unlinkSync(localFilePath);
             console.error(error);
             return null;
