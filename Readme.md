@@ -76,7 +76,7 @@ npm test
 ## Project Structure
 
 ```
-/youtube_backend
+/mediawave_backend
 ├── controllers
 ├── models
 ├── routes
