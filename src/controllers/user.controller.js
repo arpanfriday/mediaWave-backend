@@ -45,8 +45,10 @@ const registerUser = asyncHandler(async (req, res) => {
     // insert User to db
     const user = await User.create({
         fullName,
-        avatar: avatar.url,
-        coverImage: coverImage?.url || "",
+        "avatar.url": avatar.url,
+        "avatar.public_id": avatar.public_id,
+        "coverImage.url": coverImage?.url || "",
+        "coverImage.public_id": coverImage?.public_id || "",
         email,
         password,
         username: username.toLowerCase(),
@@ -221,7 +223,12 @@ const updateAvatar = asyncHandler(async (req, res) => {
 
     const user = await User.findByIdAndUpdate(
         req.body?._id,
-        { $set: { avatar: avatar.url } },
+        {
+            $set: {
+                "avatar.url": avatar.url,
+                "avatar.public_id": avatar.public_id,
+            },
+        },
         { new: true }
     ).select("-password");
 
@@ -238,7 +245,12 @@ const updateCoverImage = asyncHandler(async (req, res) => {
 
     const user = await User.findByIdAndUpdate(
         req.body?._id,
-        { $set: { coverImage: coverImage.url } },
+        {
+            $set: {
+                "coverImage.url": coverImage.url,
+                "coverImage.public_id": coverImage.public_id,
+            },
+        },
         { new: true }
     ).select("-password");
 

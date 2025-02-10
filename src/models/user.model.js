@@ -27,11 +27,22 @@ const userSchema = new Schema(
             index: true,
         },
         avatar: {
-            type: String, // cloudinary URL
-            required: true,
+            url: {
+                type: String,
+                required: true,
+            },
+            public_id: {
+                type: String,
+                required: true,
+            },
         },
         coverImage: {
-            type: String, // cloudinary URL
+            url: {
+                type: String,
+            },
+            public_id: {
+                type: String,
+            },
         },
         watchHistory: [
             {
