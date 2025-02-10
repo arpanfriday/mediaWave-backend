@@ -3,7 +3,10 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { validateUser, validateLogin } from "../utils/validationSchema.js";
-import { uploadToCloudinary } from "../utils/cloudinary.js";
+import {
+    deleteFromCloudinary,
+    uploadToCloudinary,
+} from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -218,8 +221,15 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 const updateAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path;
     if (!avatarLocalPath) throw new ApiError(400, "Avatar file is missing");
+
+    // Upload the new image
     const avatar = await uploadToCloudinary(avatarLocalPath);
     if (!avatar.url) throw new ApiError(400, "Failed to upload");
+
+    // Delete the old image
+    const deleteResult = await deleteFromCloudinary(req.body.avatar.public_id);
+    if (deleteResult?.result != "ok")
+        throw new ApiError(500, "Failed to delete old avatar asset");
 
     const user = await User.findByIdAndUpdate(
         req.body?._id,
@@ -240,8 +250,15 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     const coverImageLocalPath = req.file?.path;
     if (!coverImageLocalPath)
         throw new ApiError(400, "coverImage file is missing");
+
+    // Upload the new image
     const coverImage = await uploadToCloudinary(coverImageLocalPath);
     if (!coverImage.url) throw new ApiError(400, "Failed to upload");
+
+    // Delete the old image
+    const deleteResult = await deleteFromCloudinary(req.body.avatar.public_id);
+    if (deleteResult?.result != "ok")
+        throw new ApiError(500, "Failed to delete old coverImage asset");
 
     const user = await User.findByIdAndUpdate(
         req.body?._id,
