@@ -124,7 +124,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
-        req.user._id,
+        req.user?._id,
         { $set: { refreshToken: "" } },
         { new: true }
     );
@@ -208,7 +208,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     const { fullName, email } = req.body;
     if (!fullName && !email) throw new ApiError(400, "All fields are required");
     const user = await User.findByIdAndUpdate(
-        req.body?._id,
+        req.user?._id,
         { $set: { fullName, email } },
         { new: true }
     ).select("-password");
@@ -219,7 +219,7 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 });
 
 const updateAvatar = asyncHandler(async (req, res) => {
-    const avatarLocalPath = req.file?.path;
+    const avatarLocalPath = req.files?.avatar?.[0]?.path;
     if (!avatarLocalPath) throw new ApiError(400, "Avatar file is missing");
 
     // Upload the new image
@@ -227,12 +227,12 @@ const updateAvatar = asyncHandler(async (req, res) => {
     if (!avatar.url) throw new ApiError(400, "Failed to upload");
 
     // Delete the old image
-    const deleteResult = await deleteFromCloudinary(req.body.avatar.public_id);
+    const deleteResult = await deleteFromCloudinary(req.user?.avatar.public_id);
     if (deleteResult?.result != "ok")
         throw new ApiError(500, "Failed to delete old avatar asset");
 
     const user = await User.findByIdAndUpdate(
-        req.body?._id,
+        req.user?._id,
         {
             $set: {
                 "avatar.url": avatar.url,
@@ -246,8 +246,9 @@ const updateAvatar = asyncHandler(async (req, res) => {
         new ApiResponse(200, user, "Account avatar updated successfully")
     );
 });
+
 const updateCoverImage = asyncHandler(async (req, res) => {
-    const coverImageLocalPath = req.file?.path;
+    const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
     if (!coverImageLocalPath)
         throw new ApiError(400, "coverImage file is missing");
 
@@ -256,12 +257,14 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     if (!coverImage.url) throw new ApiError(400, "Failed to upload");
 
     // Delete the old image
-    const deleteResult = await deleteFromCloudinary(req.body.avatar.public_id);
+    const deleteResult = await deleteFromCloudinary(
+        req.user?.coverImage.public_id
+    );
     if (deleteResult?.result != "ok")
         throw new ApiError(500, "Failed to delete old coverImage asset");
 
     const user = await User.findByIdAndUpdate(
-        req.body?._id,
+        req.user?._id,
         {
             $set: {
                 "coverImage.url": coverImage.url,
