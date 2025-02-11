@@ -256,12 +256,14 @@ const updateCoverImage = asyncHandler(async (req, res) => {
     const coverImage = await uploadToCloudinary(coverImageLocalPath);
     if (!coverImage.url) throw new ApiError(400, "Failed to upload");
 
-    // Delete the old image
-    const deleteResult = await deleteFromCloudinary(
-        req.user?.coverImage.public_id
-    );
-    if (deleteResult?.result != "ok")
-        throw new ApiError(500, "Failed to delete old coverImage asset");
+    // Delete the old image if exist
+    if (req.user?.coverImage.public_id) {
+        const deleteResult = await deleteFromCloudinary(
+            req.user?.coverImage.public_id
+        );
+        if (deleteResult?.result != "ok")
+            throw new ApiError(500, "Failed to delete old coverImage asset");
+    }
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,

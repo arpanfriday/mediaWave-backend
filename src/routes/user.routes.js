@@ -5,6 +5,7 @@ import {
     refreshAccessToken,
     registerUser,
     updateAvatar,
+    updateCoverImage,
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
@@ -38,6 +39,17 @@ router.route("/update-avatar").post(
         },
     ]),
     updateAvatar
+);
+
+router.route("/update-cover").post(
+    verifyJWT,
+    upload.fields([
+        {
+            name: "coverImage",
+            maxCount: 1,
+        },
+    ]),
+    updateCoverImage
 );
 
 router.route("/refresh-token").post(refreshAccessToken);
