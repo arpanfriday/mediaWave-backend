@@ -199,8 +199,7 @@ const getLoggedInUser = asyncHandler(async (req, res) => {
         .json(
             new ApiResponse(
                 200,
-                req,
-                user,
+                req.user,
                 "Logged In user fetched succcessfully"
             )
         );
