@@ -35,7 +35,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (error) throw new ApiError(400, error.details[0].message);
 
     // Destructure the Request body and store in const variables
-    const { fullName, email, username, password } = req.body;
+    const { firstName, lastName, email, username, password } = req.body;
 
     // Check if registering user already exists
     const existedUser = await User.findOne({
@@ -51,7 +51,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // insert User to db
     const user = await User.create({
-        fullName,
+        "fullName.firstName": firstName,
+        "fullName.lastName": lastName,
         "avatar.url": avatar.url,
         "avatar.public_id": avatar.public_id,
         "coverImage.url": coverImage?.url || "",

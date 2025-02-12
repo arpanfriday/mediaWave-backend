@@ -13,7 +13,8 @@ function validateUser(user) {
                     allow: ["com", "net"],
                 },
             }),
-        fullName: joi.string().required(),
+        firstName: joi.string().required(),
+        lastName: joi.string().required(),
         avatar: joi.string().optional(), // this is explicitely checked in the controller. Hence marked as optional here
         coverImage: joi.string().optional(),
         watchHistory: joi.array().items(joi.string()).optional(),

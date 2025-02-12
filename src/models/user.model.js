@@ -21,10 +21,18 @@ const userSchema = new Schema(
             trim: true,
         },
         fullName: {
-            type: String,
-            required: true,
-            trim: true,
-            index: true,
+            firstName: {
+                type: String,
+                required: true,
+                trim: true,
+                index: true,
+            },
+            lastName: {
+                type: String,
+                required: true,
+                trim: true,
+                index: true,
+            },
         },
         avatar: {
             url: {
