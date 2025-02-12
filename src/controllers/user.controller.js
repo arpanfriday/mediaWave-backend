@@ -207,13 +207,19 @@ const getLoggedInUser = asyncHandler(async (req, res) => {
         );
 });
 
-// TODO check
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const { fullName, email } = req.body;
-    if (!fullName && !email) throw new ApiError(400, "All fields are required");
+    const { firstName, LastName, email, username } = req.body;
+    // if (!fullName && !email) throw new ApiError(400, "All fields are required");
     const user = await User.findByIdAndUpdate(
         req.user?._id,
-        { $set: { fullName, email } },
+        {
+            $set: {
+                "fullName.firstName": firstName,
+                "fullName.LastName": LastName,
+                email,
+                username,
+            },
+        },
         { new: true }
     ).select("-password");
 
