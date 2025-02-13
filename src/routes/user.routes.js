@@ -65,7 +65,7 @@ router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
 router.route("/update-user-details").post(verifyJWT, updateAccountDetails);
 
-router.route("/get-profile").post(verifyJWT, getUserChannelProfile);
+router.route("/get-profile/:username").post(verifyJWT, getUserChannelProfile);
 
 router.route("/get-watch-history").post(verifyJWT, getWatchHistory);
 
