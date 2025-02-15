@@ -64,11 +64,43 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 // controller to return subscriber list of a channel
 const getSubscribersOfChannel = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
+    const result = await Subscription.find({
+        channel: new mongoose.Types.ObjectId(channelId),
+    });
+    if (result?.length != 0)
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { result },
+                    "Subscribers fetched successfully"
+                )
+            );
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { result }, "No subscribers fetched"));
 });
 
 // controller to return channel list to which user has subscribed
 const getChannelsSubscribedTo = asyncHandler(async (req, res) => {
     const { subscriberId } = req.params;
+    const result = await Subscription.find({
+        subscriber: new mongoose.Types.ObjectId(subscriberId),
+    });
+    if (result?.length != 0)
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { result },
+                    "Channels fetched successfully"
+                )
+            );
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { result }, "No Channels fetched"));
 });
 
 export { toggleSubscription, getSubscribersOfChannel, getChannelsSubscribedTo };
