@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
 import { Video } from "../models/video.model.js";
-import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { uploadToCloudinary } from "../utils/cloudinary.js";
+import {
+    deleteFromCloudinary,
+    uploadToCloudinary,
+} from "../utils/cloudinary.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
@@ -24,8 +26,8 @@ const publishAVideo = asyncHandler(async (req, res) => {
     const video = await uploadToCloudinary(videoLocalPath);
 
     const result = await Video.create({
-        videoFile: video?.url,
-        thumbnail: thumbnail?.url,
+        videoFile: video,
+        thumbnail: thumbnail,
         title,
         description,
         duration: video.duration,
@@ -48,7 +50,49 @@ const updateVideo = asyncHandler(async (req, res) => {
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
-    //TODO: delete video
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        const video = await Video.findOne({ _id: videoId });
+
+        const videoDeleteResult = await deleteFromCloudinary(
+            video?.videoFile?.public_id,
+            video?.videoFile?.resource_type
+        );
+
+        const thumbnailDeleteResult = await deleteFromCloudinary(
+            video?.thumbnail?.public_id,
+            video?.thumbnail?.resource_type
+        );
+
+        if (videoDeleteResult.result !== "ok")
+            throw new Error(`Failed to delete video: ${video?.videoFile}`);
+        if (thumbnailDeleteResult.result !== "ok")
+            throw new Error(`Failed to delete thumbnail: ${video?.thumbnail}`);
+
+        const recordDeleteResult = await Video.deleteOne({
+            _id: videoId,
+        }).session(session);
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    { recordDeleteResult },
+                    "Record deleted successfully"
+                )
+            );
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return new ApiError(500, `Something went wrong:\n${error}`);
+    }
 });
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
