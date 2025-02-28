@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
-// const jwt = require("jsonwebtoken");
 import bcrypt from "bcrypt";
+import logger from "../utils/logger";
 
 const userSchema = new Schema(
     {
@@ -74,7 +74,7 @@ const userSchema = new Schema(
 userSchema.pre("save", async function (next) {
     try {
         if (this.isNew || this.isModified("password")) {
-            console.log("Encrypting password ===========");
+            logger.info("=========== Encrypting password ===========");
             const salt = await bcrypt.genSalt(10);
             this.password = await bcrypt.hash(this.password, salt);
             next();

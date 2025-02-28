@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import logger from "./logger";
 
 // Configuration
 cloudinary.config({
@@ -18,7 +19,7 @@ const uploadToCloudinary = async (localFilePath) => {
         })
         .then((result) => {
             fs.unlinkSync(localFilePath);
-            console.log(
+            logger.info(
                 "File uplodaded on: ",
                 result.url,
                 "and unlinked from filesystem"
@@ -28,7 +29,7 @@ const uploadToCloudinary = async (localFilePath) => {
         .catch((error) => {
             // TODO: Implement a retry strategy here. If the upload fails by any change, the upload will be retried
             fs.unlinkSync(localFilePath);
-            console.error(error);
+            logger.error(error);
             return null;
         });
     return uploadResult;
