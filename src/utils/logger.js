@@ -1,23 +1,33 @@
 import { createLogger, format, transports } from "winston";
-const { combine, timestamp, json, colorize } = format;
 
-// Custom format for console logging with colors
-const consoleLogFormat = format.combine(
-    format.colorize(),
-    format.printf(({ level, message, timestamp }) => {
-        return `${level}: ${message}`;
-    })
-);
-
-// Create a Winston logger
 const logger = createLogger({
-    level: "info",
-    format: combine(colorize(), timestamp(), json()),
+    level: "info", // Log only info and higher levels
+    format: format.combine(
+        format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        format.printf(
+            ({ timestamp, level, message }) =>
+                `${timestamp} [${level.toUpperCase()}]: ${message}`
+        )
+    ),
     transports: [
         new transports.Console({
-            format: consoleLogFormat,
+            format: format.combine(
+                // format.colorize(),
+                format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Add timestamp
+                format.printf(
+                    ({ timestamp, level, message }) =>
+                        `${timestamp} [${level.toUpperCase()}]: ${message}`
+                )
+            ),
         }),
-        new transports.File({ filename: "app.log" }),
+        new transports.File({
+            filename: "error.log",
+            level: "error", // Logs errors to error.log
+        }),
+        new transports.File({
+            filename: "app.log",
+            level: "info", // Logs all info and higher level logs
+        }),
     ],
 });
 
