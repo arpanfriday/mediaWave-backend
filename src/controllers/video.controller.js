@@ -112,7 +112,50 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
-    //TODO: update video details like title, description, thumbnail
+    if (!mongoose.Types.ObjectId.isValid(videoId))
+        throw new ApiError(400, "No valid video ID found");
+
+    const { title, description } = req?.body;
+    const thumbnailLocalPath = req?.files?.thumbnail?.[0]?.path;
+    const videoLocalPath = req?.files?.videoFile?.[0]?.path;
+    let videoFile;
+    let thumbnail;
+
+    const video = await Video.findById(videoId);
+
+    if (thumbnailLocalPath) {
+        const thumbnailDeleteResult = await deleteFromCloudinary(
+            video?.thumbnail?.public_id,
+            video?.thumbnail?.resource_type
+        );
+        if (thumbnailDeleteResult.result == "ok")
+            thumbnail = await uploadToCloudinary(thumbnailLocalPath);
+    }
+    if (videoLocalPath) {
+        const videoDeleteResult = await deleteFromCloudinary(
+            video?.videoFile?.public_id,
+            video?.videoFile?.resource_type
+        );
+        if (videoDeleteResult.result == "ok")
+            videoFile = await uploadToCloudinary(videoLocalPath);
+    }
+
+    const updateResult = await Video.updateOne(
+        { _id: videoId },
+        videoFile && thumbnail
+            ? { title, description, videoFile, thumbnail }
+            : videoFile
+              ? { title, description, videoFile }
+              : thumbnail
+                ? { title, description, thumbnail }
+                : { title, description }
+    );
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, updateResult, "Record updated successfullt")
+        );
 });
 
 const deleteVideo = asyncHandler(async (req, res) => {
@@ -164,6 +207,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
+    //TODO: toggle publish status
 });
 
 export {
