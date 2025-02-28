@@ -20,9 +20,7 @@ const uploadToCloudinary = async (localFilePath) => {
         .then((result) => {
             fs.unlinkSync(localFilePath);
             logger.info(
-                "File uplodaded on: ",
-                result.url,
-                "and unlinked from filesystem"
+                `File uplodaded on: ${result.url} and unlinked from filesystem`
             );
             return result;
         })
