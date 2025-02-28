@@ -154,7 +154,7 @@ const updateVideo = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(
-            new ApiResponse(200, updateResult, "Record updated successfullt")
+            new ApiResponse(200, updateResult, "Record updated successfully")
         );
 });
 
@@ -207,7 +207,18 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
-    //TODO: toggle publish status
+    if (!mongoose.Types.ObjectId.isValid(videoId))
+        throw new ApiError(400, "Video ID is invalid");
+
+    const video = await Video.findById(videoId);
+    if (!video) throw new ApiError(404, "Video not found");
+
+    video.isPublished = !video.isPublished;
+    await video.save();
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, video, "Toggled successfully"));
 });
 
 export {
