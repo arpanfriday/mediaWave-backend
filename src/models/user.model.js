@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import logger from "../utils/logger";
+import logger from "../utils/logger.js";
 
 const userSchema = new Schema(
     {
