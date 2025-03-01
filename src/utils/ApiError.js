@@ -1,9 +1,11 @@
+import logger from "./logger.js";
+
 class ApiError extends Error {
     constructor(
         statusCode,
         message = "Something went wrong",
-        errors = [],
-        stack = ""
+        errors = []
+        // stack = ""
     ) {
         super(message);
         this.statusCode = statusCode;
@@ -12,11 +14,12 @@ class ApiError extends Error {
         this.success = false;
         this.errors = errors;
 
-        if (stack) {
-            this.stack = stack;
-        } else {
-            Error.captureStackTrace(this, this.constructor);
-        }
+        Error.captureStackTrace(this, this.constructor);
+        this.logError();
+    }
+    logError() {
+        // Log the error message along with the stack trace
+        logger.error(this.message, { stack: this.stack });
     }
 }
 

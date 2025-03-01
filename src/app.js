@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocs from "./swagger.js";
-import morganConfig from "./middlewares/logger.middleware.js";
+import morganMiddleware from "./middlewares/logger.middleware.js";
 
 const app = express();
 app.use(
@@ -16,8 +16,8 @@ app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(cookieParser());
+app.use(morganMiddleware);
 app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-app.use(morganConfig);
 
 // Routes Import
 import userRouter from "./routes/user.routes.js";

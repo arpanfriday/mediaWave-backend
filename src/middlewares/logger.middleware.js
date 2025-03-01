@@ -21,11 +21,19 @@ morgan.token("response-time-unit", (req, _res) => {
     return diff >= 1000 ? `${(diff / 1000).toFixed(2)} s` : `${diff} ms`;
 });
 
-const morganConfig = morgan(
-    ":method :url :status :content-length - :response-time-unit",
-    {
-        stream,
-    }
-);
+const morganMiddleware = (req, res, next) => {
+    req._startTime = Date.now(); // Start time before request
 
-export default morganConfig;
+    morgan("⬆️ CALL START: :method :url", { immediate: true, stream })(
+        req,
+        res,
+        () => {}
+    );
+
+    // Log response time and content-length later
+    morgan("✅ :status :url :content-length - :response-time-unit", {
+        stream,
+    })(req, res, next);
+};
+
+export default morganMiddleware;
