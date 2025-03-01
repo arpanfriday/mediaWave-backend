@@ -4,6 +4,7 @@ import morgan from "morgan";
 const stream = {
     write: (message) => logger.info(message.trim()),
 };
+
 morgan.token("content-length", (_req, res) => {
     const contentLength = parseInt(res.get("content-length")) || 0;
 
@@ -21,19 +22,23 @@ morgan.token("response-time-unit", (req, _res) => {
     return diff >= 1000 ? `${(diff / 1000).toFixed(2)} s` : `${diff} ms`;
 });
 
+morgan.token("request-id", (req) => req.requestId);
+
 const morganMiddleware = (req, res, next) => {
     req._startTime = Date.now(); // Start time before request
 
-    morgan("⬆️ CALL START: :method :url", { immediate: true, stream })(
-        req,
-        res,
-        () => {}
-    );
+    morgan("⬆️ [:request-id] :method :url", {
+        immediate: true,
+        stream,
+    })(req, res, () => {});
 
     // Log response time and content-length later
-    morgan("✅ :status :url :content-length - :response-time-unit", {
-        stream,
-    })(req, res, next);
+    morgan(
+        "⬇️ [:request-id] :status :url :content-length - :response-time-unit",
+        {
+            stream,
+        }
+    )(req, res, next);
 };
 
 export default morganMiddleware;

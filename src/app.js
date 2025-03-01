@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocs from "./swagger.js";
 import morganMiddleware from "./middlewares/logger.middleware.js";
+import requestIdMiddleware from "./middlewares/requestId.middleware.js";
 
 const app = express();
 app.use(
@@ -16,6 +17,7 @@ app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(cookieParser());
+app.use(requestIdMiddleware);
 app.use(morganMiddleware);
 app.use("/api/v1/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
