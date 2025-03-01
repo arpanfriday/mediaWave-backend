@@ -7,7 +7,7 @@ const logger = createLogger({
         format.printf(({ timestamp, level, message, stack }) => {
             let log = `${timestamp} [${level.toUpperCase()}]: ${message}`;
             if (stack) {
-                log += `\nStack Trace:\n${stack}`;
+                log += `\nErrorStackTrace:\n${stack}`;
             }
             return log;
         })
