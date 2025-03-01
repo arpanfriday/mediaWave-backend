@@ -27,6 +27,7 @@ morgan.token("request-id", (req) => req.requestId);
 const morganMiddleware = (req, res, next) => {
     req._startTime = Date.now(); // Start time before request
 
+    // Log the request before being sent
     morgan("\u21b1 [:request-id] :method :url", {
         immediate: true,
         stream,

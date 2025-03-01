@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { User } from "../models/user.model.js";
 import { Subscription } from "../models/subscription.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -33,7 +32,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
                         new ApiResponse(
                             200,
                             { subscribed: true, result: result },
-                            "You Subscribed to the channel"
+                            `user ${req.user?._id} subscribed to the channel ${channelId}`
                         )
                     );
             })
@@ -51,7 +50,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
                         new ApiResponse(
                             200,
                             { subscribed: false, result: [result] },
-                            "You Unsubscribed to the channel"
+                            `user ${req.user?._id} unsubscribed to the channel ${channelId}`
                         )
                     );
             })
@@ -74,7 +73,7 @@ const getSubscribersOfChannel = asyncHandler(async (req, res) => {
                 new ApiResponse(
                     200,
                     { result },
-                    "Subscribers fetched successfully"
+                    `subscribers of channel ${channelId} fetched successfully`
                 )
             );
     return res
@@ -95,7 +94,7 @@ const getChannelsSubscribedTo = asyncHandler(async (req, res) => {
                 new ApiResponse(
                     200,
                     { result },
-                    "Channels fetched successfully"
+                    `subscriptions of user ${subscriberId} fetched successfully`
                 )
             );
     return res
