@@ -5,7 +5,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
-const createTweet = asyncHandler(async (req, res) => {
+const createTweet = asyncHandler(async (req, res, next) => {
     const { content } = req.body;
     Tweet.create({
         content: content,
@@ -18,32 +18,41 @@ const createTweet = asyncHandler(async (req, res) => {
                     new ApiResponse(
                         200,
                         { result },
-                        "Tweet created successfully"
+                        `tweet ${result._id} created by ${req.user?._id}`
                     )
                 );
         })
         .catch((error) => {
-            return new ApiError(500, "Cannot create the record:\n" + error);
+            next(new ApiError(500, "Cannot create the record: " + error));
         });
 });
 
-const getUserTweets = asyncHandler(async (req, res) => {
+const getUserTweets = asyncHandler(async (req, res, next) => {
     const userId = req.params;
 
     Tweet.find({ owner: new mongoose.Types.ObjectId(userId?.userId) })
         .then((result) => {
             return res
                 .status(200)
-                .json(new ApiResponse(200, result, "Fetched all the tweets"));
+                .json(
+                    new ApiResponse(
+                        200,
+                        result,
+                        `fetched all the tweets of user ${userId?.userId}`
+                    )
+                );
         })
         .catch((error) => {
-            new ApiError(500, "Error fetching data:\n", error);
+            next(new ApiError(500, "error fetching data: ", error));
         });
 });
 
-const updateTweet = asyncHandler(async (req, res) => {
+const updateTweet = asyncHandler(async (req, res, next) => {
     const { content } = req.body;
     const { tweetId } = req.params;
+
+    if (!content) throw new ApiError(400, `content is missing`);
+
     Tweet.updateOne(
         { _id: tweetId },
         {
@@ -58,16 +67,16 @@ const updateTweet = asyncHandler(async (req, res) => {
                     new ApiResponse(
                         200,
                         { result },
-                        "Tweet updated successfully"
+                        `tweet ${tweetId} updated successfully`
                     )
                 );
         })
         .catch((error) => {
-            return new ApiError(500, "Cannot update the record:\n" + error);
+            next(new ApiError(500, "cannot update the record: " + error));
         });
 });
 
-const deleteTweet = asyncHandler(async (req, res) => {
+const deleteTweet = asyncHandler(async (req, res, next) => {
     const { tweetId } = req.params;
     Tweet.deleteOne({ _id: tweetId })
         .then((result) => {
@@ -77,12 +86,12 @@ const deleteTweet = asyncHandler(async (req, res) => {
                     new ApiResponse(
                         200,
                         { result },
-                        "Tweet deleted successfully"
+                        `tweet ${tweetId} deleted successfully`
                     )
                 );
         })
         .catch((error) => {
-            return new ApiError(500, "Cannot delete the record:\n" + error);
+            next(new ApiError(500, "cannot delete the record: " + error));
         });
 });
 
