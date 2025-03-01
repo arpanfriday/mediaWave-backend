@@ -78,7 +78,13 @@ const getSubscribersOfChannel = asyncHandler(async (req, res) => {
             );
     return res
         .status(200)
-        .json(new ApiResponse(200, { result }, "No subscribers fetched"));
+        .json(
+            new ApiResponse(
+                200,
+                { result },
+                `no subscribers fetched for channel ${channelId}`
+            )
+        );
 });
 
 // controller to return channel list to which user has subscribed
@@ -99,7 +105,13 @@ const getChannelsSubscribedTo = asyncHandler(async (req, res) => {
             );
     return res
         .status(200)
-        .json(new ApiResponse(200, { result }, "No Channels fetched"));
+        .json(
+            new ApiResponse(
+                200,
+                { result },
+                `user ${subscriberId} has no subscriptions`
+            )
+        );
 });
 
 export { toggleSubscription, getSubscribersOfChannel, getChannelsSubscribedTo };
