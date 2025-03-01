@@ -27,14 +27,14 @@ morgan.token("request-id", (req) => req.requestId);
 const morganMiddleware = (req, res, next) => {
     req._startTime = Date.now(); // Start time before request
 
-    morgan("⬆️ [:request-id] :method :url", {
+    morgan("\u21b1 [:request-id] :method :url", {
         immediate: true,
         stream,
     })(req, res, () => {});
 
     // Log response time and content-length later
     morgan(
-        "⬇️ [:request-id] :status :url :content-length - :response-time-unit",
+        "\u2190 [:request-id] :status :url :content-length - :response-time-unit",
         {
             stream,
         }
