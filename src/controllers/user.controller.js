@@ -9,6 +9,7 @@ import {
 } from "../utils/cloudinary.js";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import logger from "../utils/logger.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -408,6 +409,28 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         );
 });
 
+const getAllUsers = asyncHandler(async (_req, res) => {
+    try {
+        const result = await User.aggregate([
+            {
+                $project: {
+                    _id: 1,
+                },
+            },
+        ]);
+
+        let ids = [];
+        result.forEach((id) => ids.push(id._id.toString()));
+        logger.info(`${ids}`);
+
+        return res
+            .status(200)
+            .json(new ApiResponse(200, result, "all users fetched"));
+    } catch (error) {
+        throw new ApiError(400, error);
+    }
+});
+
 export {
     registerUser,
     loginUser,
@@ -420,4 +443,5 @@ export {
     updateCoverImage,
     getUserChannelProfile,
     getWatchHistory,
+    getAllUsers,
 };
