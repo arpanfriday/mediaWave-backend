@@ -419,8 +419,8 @@ const getAllUsers = asyncHandler(async (_req, res) => {
             },
         ]);
 
-        let ids = [];
-        result.forEach((id) => ids.push(id._id.toString()));
+        let ids;
+        result.forEach((id) => (ids += '"' + id._id.toString() + '",'));
         logger.info(`${ids}`);
 
         return res
