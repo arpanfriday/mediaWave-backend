@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
-import swaggerDocs from "./swagger.js";
+import swaggerDocs from "./middlewares/swagger.middleware.js";
 import morganMiddleware from "./middlewares/logger.middleware.js";
 import requestIdMiddleware from "./middlewares/requestId.middleware.js";
 
