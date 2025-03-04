@@ -1,0 +1,37 @@
+config:
+    target: "http://localhost:8000/api/v1"
+    phases:
+        - duration: 1
+          arrivalRate: 1
+    processor: "src/utils/extractTokens.js" # Link External Script
+    defaults:
+        headers:
+            Content-Type: "application/json"
+        logLevel: debug
+
+scenarios:
+    - name: User Load Test with External Script
+      flow:
+          - post:
+                url: "/users/login"
+                json:
+                    loginString: "snehasmiles"
+                    password: "hello987"
+                capture:
+                    - header: set-cookie
+                      as: authToken
+          - log: "Auth Token Raw: {{ authToken }}"
+
+          - function: "extractTokens" # Call External JS Function
+
+          - log: "Access Token: {{ accessToken }}"
+          - log: "Refresh Token: {{ refreshToken }}"
+
+          - post:
+                url: "/users/get-profile/arpanmaity"
+                headers:
+                    Cookie: "accessToken={{ accessToken }}; refreshToken={{ refreshToken }}"
+                expect:
+                    - statusCode: 200
+                    - contentType: json
+          - log: "API Hit Successful!"
