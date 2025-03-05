@@ -1,7 +1,28 @@
-export function extractTokens(context, events, done) {
-    const cookies = context.vars.authToken; // ["accessToken=xxx", "refreshToken=yyy"]
+const metricsByEndpoint_beforeRequest = function (
+    request,
+    _context,
+    _events,
+    done
+) {
+    // console.log("Request Sent:", request);
+    return done();
+};
 
-    console.log("Raw Cookies: ", cookies);
+const metricsByEndpoint_afterResponse = function (
+    _request,
+    response,
+    _context,
+    _events,
+    done
+) {
+    // console.log("Response Received:", response.statusCode);
+    return done();
+};
+
+const extractTokens = function (context, _events, done) {
+    const cookies = context.vars.authToken;
+
+    // console.log("Raw Cookies: ", cookies);
 
     if (cookies && Array.isArray(cookies)) {
         // Access Token Extraction
@@ -9,18 +30,24 @@ export function extractTokens(context, events, done) {
             .find((cookie) => cookie.includes("accessToken"))
             ?.match(/accessToken=([^;]+)/)?.[1];
 
-        console.log("Extracted Access Token: ", accessToken);
+        if (accessToken) console.log("Extracted Access Token");
 
         // Refresh Token Extraction
         const refreshToken = cookies
             .find((cookie) => cookie.includes("refreshToken"))
             ?.match(/refreshToken=([^;]+)/)?.[1];
 
-        console.log("Extracted Refresh Token: ", refreshToken);
+        if (refreshToken) console.log("Extracted Refresh Token");
 
         // Save Tokens to Context Variables
         context.vars.accessToken = accessToken;
         context.vars.refreshToken = refreshToken;
     }
     return done();
-}
+};
+
+export {
+    metricsByEndpoint_beforeRequest,
+    metricsByEndpoint_afterResponse,
+    extractTokens,
+};

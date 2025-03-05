@@ -1,8 +1,8 @@
 config:
     target: "http://localhost:8000/api/v1"
     phases:
-        - duration: 1
-          arrivalRate: 1
+        - duration: 60
+          arrivalRate: 5
     processor: "src/utils/extractTokens.js" # Link External Script
     defaults:
         headers:
@@ -10,7 +10,7 @@ config:
         logLevel: debug
 
 scenarios:
-    - name: User Load Test with External Script
+    - name: Search for user profile
       flow:
           - post:
                 url: "/users/login"
@@ -20,12 +20,11 @@ scenarios:
                 capture:
                     - header: set-cookie
                       as: authToken
-          - log: "Auth Token Raw: {{ authToken }}"
 
-          - function: "extractTokens" # Call External JS Function
+          - function: "extractTokens"
 
-          - log: "Access Token: {{ accessToken }}"
-          - log: "Refresh Token: {{ refreshToken }}"
+          #   - log: "Access Token: {{ accessToken }}"
+          #   - log: "Refresh Token: {{ refreshToken }}"
 
           - post:
                 url: "/users/get-profile/arpanmaity"
