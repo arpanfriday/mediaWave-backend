@@ -5,6 +5,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerDocs from "./middlewares/swagger.middleware.js";
 import morganMiddleware from "./middlewares/logger.middleware.js";
 import requestIdMiddleware from "./middlewares/requestId.middleware.js";
+import "./config/redisConfig.js";
 
 const app = express();
 app.use(

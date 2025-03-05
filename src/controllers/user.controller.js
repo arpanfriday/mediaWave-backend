@@ -10,6 +10,7 @@ import {
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
+import redisClient from "../config/redisConfig.js";
 
 const generateAccessAndRefreshTokens = async (userId) => {
     try {
@@ -297,56 +298,65 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     const { username } = req.params;
     if (!username?.trim()) throw new ApiError(400, "Username is missing");
 
-    const channel = await User.aggregate([
-        {
-            $match: {
-                username: username?.toLowerCase(),
-            },
-        },
-        {
-            $lookup: {
-                from: "subscriptions",
-                localField: "_id",
-                foreignField: "channel",
-                as: "subscribers",
-            },
-        },
-        {
-            $lookup: {
-                from: "subscriptions",
-                localField: "_id",
-                foreignField: "subscriber",
-                as: "subscribedTo",
-            },
-        },
-        {
-            $addFields: {
-                subscribersCount: {
-                    $size: "$subscribers",
+    let channel = null;
+    const key = "user-profile: " + username?.toLowerCase();
+    const value = await redisClient.get(key);
+    if (value) {
+        channel = JSON.parse(value);
+        logger.info(`cache hit`);
+    } else {
+        channel = await User.aggregate([
+            {
+                $match: {
+                    username: username?.toLowerCase(),
                 },
-                channelsSubscribedToCount: {
-                    $size: "$subscribedTo",
+            },
+            {
+                $lookup: {
+                    from: "subscriptions",
+                    localField: "_id",
+                    foreignField: "channel",
+                    as: "subscribers",
                 },
-                isSubscribed: {
-                    $cond: {
-                        if: { $in: [req.user?._id, "$subscribers.subscriber"] },
-                        then: true,
-                        else: false,
+            },
+            {
+                $lookup: {
+                    from: "subscriptions",
+                    localField: "_id",
+                    foreignField: "subscriber",
+                    as: "subscribedTo",
+                },
+            },
+            {
+                $addFields: {
+                    subscribersCount: {
+                        $size: "$subscribers",
+                    },
+                    channelsSubscribedToCount: {
+                        $size: "$subscribedTo",
+                    },
+                    isSubscribed: {
+                        $cond: {
+                            if: {
+                                $in: [req.user?._id, "$subscribers.subscriber"],
+                            },
+                            then: true,
+                            else: false,
+                        },
                     },
                 },
             },
-        },
-        {
-            $project: {
-                password: 0,
+            {
+                $project: {
+                    password: 0,
+                },
             },
-        },
-    ]);
+        ]);
+        await redisClient.set(key, JSON.stringify(channel), { EX: 300 });
+        logger.info(`cache miss`);
+    }
 
     if (!channel?.length) throw new ApiError(400, "Channel does not exist");
-
-    // TODO remove this log
-    console.log("channel ::: \n", channel);
 
     return res
         .status(200)
