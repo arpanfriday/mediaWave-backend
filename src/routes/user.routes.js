@@ -15,6 +15,7 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { rateLimit } from "../middlewares/rateLimiter.middleware.js";
 
 const router = Router();
 
@@ -68,7 +69,9 @@ router.route("/change-password").post(verifyJWT, changeCurrentPassword);
 
 router.route("/update-user-details").post(verifyJWT, updateAccountDetails);
 
-router.route("/get-profile/:username").post(verifyJWT, getUserChannelProfile);
+router
+    .route("/get-profile/:username")
+    .post(verifyJWT, rateLimit, getUserChannelProfile);
 
 router.route("/get-watch-history").post(verifyJWT, getWatchHistory);
 
