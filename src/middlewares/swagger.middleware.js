@@ -21,7 +21,7 @@ const swaggerDefinition = {
 
 const swaggerOptions = {
     swaggerDefinition,
-    apis: ["./routes/*.js"], // Path to the API docs
+    apis: ["src/routes/*.routes.js"], // Path to the API docs
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
